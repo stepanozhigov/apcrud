@@ -12,4 +12,9 @@ class Product extends Model
     protected $fillable = [
         'code','name','price'
     ];
+
+    //oneToMany
+    public function ordered_products() {
+        return $this->hasMany(OrderedProduct::class);
+    }
 }
