@@ -4,6 +4,11 @@
         <div class="container">
             <div class="row">
                 <div class="col-12">
+                    @if(session()->has('message'))
+                        <div class="alert alert-success" role="alert">
+                            {{$message}}
+                      </div>
+                    @endif
                     <div class="card">
                         <div class="card-header">
                             <h3>Products
