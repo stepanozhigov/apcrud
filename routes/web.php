@@ -14,4 +14,4 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/products', Products::class);
+Route::get('/', Products::class);

@@ -13,7 +13,16 @@ class Product extends Model
         'code','name','price'
     ];
 
-    //oneToMany
+    public function getPriceAttribute($val)
+    {
+        return $val/100;
+    }
+
+    public function setPriceAttribute($val)
+    {
+        $this->attributes['price'] =  $val*100;
+    }
+
     public function ordered_products() {
         return $this->hasMany(OrderedProduct::class);
     }

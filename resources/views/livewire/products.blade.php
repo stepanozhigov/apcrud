@@ -1,12 +1,14 @@
 <div>
     @include('livewire.products-create')
+    @include('livewire.products-edit')
     <section class="my-4">
         <div class="container">
             <div class="row">
                 <div class="col-12">
                     @if(session()->has('message'))
-                        <div class="alert alert-success" role="alert">
-                            {{$message}}
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <strong>{{session('message')}}</strong>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                       </div>
                     @endif
                     <div class="card">
@@ -28,7 +30,7 @@
                                   </thead>
                                   <tbody>
                                       @foreach ($products as $product)
-                                        <tr>
+                                        <tr wire:click.prevent = "$emit('openProductEditModal',{{$product->id}})">
                                             <th scope="row">{{$product->id}}</th>
                                             <td>{{$product->code}}</td>
                                             <td>{{$product->name}}</td>

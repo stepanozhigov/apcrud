@@ -22,10 +22,31 @@
     @livewireScripts
     <script>
         $(function() {
+            //create modal (bs5)
             const createProductEl = document.getElementById('createProductModal');
             const createProductModal = new bootstrap.Modal(createProductEl, {});
-            $(document).on('productCreated',() => {
-                createProductModal.hide();
+
+            window.livewire.on('productCreated',() => {
+                    console.log('document event: productCreated');
+                    createProductModal.hide();
+                });
+
+            //edit modal (bs5)
+            const editProductEl = document.getElementById('editProductModal');
+            const editProductModal = new bootstrap.Modal(editProductEl, {});
+
+            window.livewire.on('openProductEditModal',() => {
+                    console.log('document event: openProductEditModal');
+                    editProductModal.show();
+                });
+
+            window.livewire.on('productUpdated',() => {
+                    console.log('document event: productUpdated');
+                    editProductModal.hide();
+                });
+            window.livewire.on('productDeleted',() => {
+                console.log('document event: productDeleted');
+                editProductModal.hide();
             });
         });
     </script>
