@@ -4,7 +4,7 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Edit Product</h5>
+          <h5 class="modal-title" id="exampleModalLabel">Edit Product ({{'#'.$this->_id}})</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
@@ -40,7 +40,7 @@
         </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-danger" wire:click.prevent="delete()">Delete Product</button>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-secondary" wire:click.prevent="$emit('closeProductEditModal')">Close</button>
             <button type="button" class="btn btn-primary" wire:click.prevent="update()">Update Product</button>
         </div>
       </div>

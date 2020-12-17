@@ -39,6 +39,10 @@
                     console.log('document event: openProductEditModal');
                     editProductModal.show();
                 });
+            window.livewire.on('closeProductEditModal',() => {
+                    console.log('document event: closeProductEditModal');
+                    editProductModal.hide();
+                });
 
             window.livewire.on('productUpdated',() => {
                     console.log('document event: productUpdated');

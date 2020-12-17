@@ -12,7 +12,7 @@ class Products extends Component
     public $name;
     public $price;
 
-    protected $listeners = ['openProductEditModal' => 'edit'];
+    protected $listeners = ['openProductEditModal' => 'edit','closeProductEditModal'=>'resetInputFields'];
 
     public function resetInputFields() {
         $this->_id = '';
@@ -22,9 +22,13 @@ class Products extends Component
     }
 
     public function updatedCode() {
-        $data = $this->validate([
-            'code'=>['required','unique:products,code,'.$this->code],
-        ]);
+        // dd($this->_id);
+        $code_rules = ['required'];
+        if($this->_id) {
+            $code_rules = array_merge($code_rules,['unique:products,code,'.$this->_id]);
+        }
+        // dd($code_rules);
+        $data = $this->validate(['code'=>$code_rules]);
     }
 
     public function store() {
@@ -49,7 +53,7 @@ class Products extends Component
 
     public function update() {
         $data = $this->validate([
-            'code' => 'required | unique:products,id,'.$this->_id,
+            'code' => 'required | unique:products,code,'.$this->_id,
             'name' => 'required',
             'price' => 'required | numeric',
         ]);
