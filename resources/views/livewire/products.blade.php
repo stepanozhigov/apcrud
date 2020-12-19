@@ -19,26 +19,7 @@
                             
                         </div>
                         <div class="card-body">
-                            <table class="table table-striped table-hover">
-                                <thead>
-                                    <tr>
-                                      <th scope="col">#</th>
-                                      <th scope="col">Code</th>
-                                      <th scope="col">Name</th>
-                                      <th scope="col">Price</th>
-                                    </tr>
-                                  </thead>
-                                  <tbody>
-                                      @foreach ($products as $product)
-                                        <tr wire:click.prevent = "$emit('openProductEditModal',{{$product->id}})">
-                                            <th scope="row">{{$product->id}}</th>
-                                            <td>{{$product->code}}</td>
-                                            <td>{{$product->name}}</td>
-                                            <td>{{$product->price}}</td>
-                                        </tr>
-                                      @endforeach
-                                  </tbody>
-                              </table>
+                            <livewire:products-table type="edit" />
                         </div>
                     </div>
                 </div>

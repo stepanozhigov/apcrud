@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Livewire\Products;
+use App\Http\Livewire\Order;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,3 +16,4 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', Products::class);
+Route::get('/order', Order::class);

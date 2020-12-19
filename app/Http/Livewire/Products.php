@@ -7,10 +7,16 @@ use Livewire\Component;
 
 class Products extends Component
 {
+    //selected product id
     public $_id;
+
+    //form fields
     public $code;
     public $name;
     public $price;
+
+    //
+    public $selected_products;
 
     protected $listeners = ['openProductEditModal' => 'edit','closeProductEditModal'=>'resetInputFields'];
 
@@ -38,9 +44,8 @@ class Products extends Component
             'price' => 'required | numeric',
         ]);
         $product = Product::create($data);
-        session()->flash('message',"Product '$product->name' created successfully");
+        $this->emit('productCreated',$product->id);
         $this->resetInputFields();
-        $this->emit('productCreated');
     }
 
     public function edit($id) {
@@ -59,23 +64,21 @@ class Products extends Component
         ]);
         $product = Product::find($this->_id);
         $product->update($data);
-        session()->flash('message',"Product '$product->name' updated successfully");
+        $this->emit('productUpdated',$product->id);
         $this->resetInputFields();
-        $this->emit('productUpdated');
     }
 
     public function delete() {
         Product::destroy($this->_id);
-        session()->flash('message',"Product deleted successfully");
+        $this->emit('productDeleted',$this->_id);
         $this->resetInputFields();
-        $this->emit('productDeleted');
     }
 
     public function render()
     {
         $products = Product::all()->reverse();
         return view('livewire.products',['products'=>$products])
-                    ->extends('layouts.app')
+                    ->extends('pages.products-page')
                     ->section('content');
     }
 }
