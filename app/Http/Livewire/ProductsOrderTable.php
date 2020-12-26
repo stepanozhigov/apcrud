@@ -61,7 +61,7 @@ class ProductsOrderTable extends Component
         return $this->cart_products->firstWhere('product_id',$product_id);
     }
 
-    public function addToCart($product_id) {
+    public function changeCart($action = 'add',$product_id) {
 
         //get item id in cart
         $cart_key = $this->cart->search(function($item,$i) use ($product_id) {
@@ -75,7 +75,13 @@ class ProductsOrderTable extends Component
             //update existing
             // dd('existing');
             $item = $this->cart[$cart_key];
-            $item['quantity'] +=1;
+            if($action == 'add') {
+                $item['quantity'] +=1;
+            } else if($action == 'substract') {
+                if($item['quantity'] > 0) {
+                    $item['quantity'] -=1;
+                }
+            }
             $item['amount'] = $item['quantity']*$item['price'];
             $this->cart[$cart_key] = $item;
         } else {

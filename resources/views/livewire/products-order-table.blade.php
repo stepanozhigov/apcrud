@@ -23,8 +23,8 @@
                     <td>{{$item['amount']}}</td>
                     <td>
                         <div class="d-flex justify-content-center">
-                            <button wire:click.prevent = "addToCart({{$item['product_id']}})" type="button" class="btn btn-warning mx-1">Add</button>
-                            @if($item['quantity'] > 0) <button  wire:click.prevent = "removeFromCart({{$item['product_id']}})" type="button" class="btn btn-danger mx-1">Remove</button> @endif
+                            <button wire:click.prevent = "changeCart('add',{{$item['product_id']}})" type="button" class="btn btn-warning mx-1">Add</button>
+                            @if($item['quantity'] > 0) <button  wire:click.prevent = "changeCart('substract',{{$item['product_id']}})" type="button" class="btn btn-danger mx-1">Remove</button> @endif
                         </div>
                     </td>
                 </tr>
