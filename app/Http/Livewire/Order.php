@@ -13,6 +13,7 @@ class Order extends Component
 {
     public $customer;
     public $cart;
+    public $cart_total;
     public $tab = 'products';
 
 
@@ -23,21 +24,23 @@ class Order extends Component
     ];
 
     public function mount() {
-        $this->getSessionCustomer();
-       $this->getSessionOrderProducts();
+        $this->setSessionCustomer();
+        $this->setSessionOrderProducts();
+        $this->setCartTotal();
     }
 
-    public function getSessionOrderProducts() {
-        $session_ids = session()->get('order_product_ids');
-        if(is_array($session_ids)) {
-            $this->cart = Product::whereIn('id',array_values($session_ids))->orderBy('name')->get();
+    public function setSessionOrderProducts() {
+        $cart = session()->get('cart');
+        if($cart) {
+            $this->cart = collect($cart);
             
         } else {
             $this->cart = collect([]);
         }
+        //dd($this->cart);
     }
 
-    public function getSessionCustomer() {
+    public function setSessionCustomer() {
         $this->selected_customer_id = session()->get('selected_customer_id');
         
         if($this->selected_customer_id) {
@@ -45,6 +48,13 @@ class Order extends Component
         } else {
             $this->customer = null;
         }
+    }
+
+    public function setCartTotal() {
+        $total = $this->cart->reduce(function ($total, $product) {
+            return $total + $product['amount'];
+        }, 0);
+        $this->cart_total = $total;
     }
 
     public function setTab($tabName) {
@@ -75,11 +85,10 @@ class Order extends Component
         ]);
 
         //CREATE ORDERED PRODUCTS FROM CART
-        //$ordered_products = OrderedProduct::
 
         $this->cart->each(function ($product, $key) use ($order) {
-            dd($product);
-            dd($product->only(['number', 'amount']));
+            // dd($product);
+            // dd($product->only(['number', 'amount']));
             $ordered_product = OrderedProduct::create($product->only(['number', 'amount']));
             $order->ordered_products()->save($ordered_product);
             $ordered_product->product()->associate($product);

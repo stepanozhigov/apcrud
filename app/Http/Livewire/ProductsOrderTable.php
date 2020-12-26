@@ -7,9 +7,14 @@ use Livewire\Component;
 
 class ProductsOrderTable extends Component
 {
+    //db products
     public $products;
-    //item [product_id=>name=>'quantity'=>,'price'=>,'amount'=>]
-    public $cart = [];
+    //products for cart
+    public $cart_products;
+    //products selected for checkout
+    public $cart;
+    //type of table
+    public $type;
 
     protected $listeners = [
         
@@ -17,24 +22,28 @@ class ProductsOrderTable extends Component
 
     public function mount() {
         $this->getSessionCart();
+        $this->getCartProducts();
     }
 
     public function getSessionCart() {
-        $session_cart = session()->get('cart');
-        
-        if(is_array($session_cart)) {
-            $this->cart = collect($session_cart);
+        $cart = session()->get('cart');
+
+        if(is_array($cart)) {
+            $this->cart = collect($cart);
         } else {
-            $this->cart = $this->getProducts();
+            $this->cart = collect([]);
         }
+        // dd(session()->get('cart'));
     }
 
-    public function getProducts() {
+    public function getCartProducts() {
         $this->products = Product::orderBy('name')->get();
-        $cart = collect([]);
+        $items = collect([]);
+        $cart = $this->cart;
+        // dd($cart);
 
         if($this->products->count() > 0) {
-            $this->products->each(function ($product, $key) use ($cart) {
+            $this->products->each(function ($product, $key) use ($items,$cart) {
                     $item = [
                         'product_id' => $product->id,
                         'name' => $product->name,
@@ -42,32 +51,51 @@ class ProductsOrderTable extends Component
                         'price' => $product->price,
                         'amount' => 0,
                     ];
-                    $cart->push($item);
-                });
-            }
-            $this->cart = $cart;
+                    $items->push($item);
+            });
+            $this->cart_products =  $items;
+        }
     }
 
-    //SELECT
+    public function getCartProductById($product_id) {
+        return $this->cart_products->firstWhere('product_id',$product_id);
+    }
 
-    public function addToCart(Product $product) {
+    public function addToCart($product_id) {
 
         //get item id in cart
-        $cart_key = $this->cart->search(function($item,$i) use ($product) {
-            return $product->id == $item['product_id'];
+        $cart_key = $this->cart->search(function($item,$i) use ($product_id) {
+            return $product_id == $item['product_id'];
         });
-        
-        //update
-        $item = $this->cart[$cart_key];
-        $item['quantity'] +=1;
-        $item['amount'] = $item['quantity']*$item['price'];
-        $this->cart[$cart_key] = $item;
+
+        // dd($cart_key);
+        // dd($this->cart);
+
+        if(is_int($cart_key)) {
+            //update existing
+            // dd('existing');
+            $item = $this->cart[$cart_key];
+            $item['quantity'] +=1;
+            $item['amount'] = $item['quantity']*$item['price'];
+            $this->cart[$cart_key] = $item;
+        } else {
+            //add product to cart
+            // dd('new');
+            $item = $this->getCartProductById($product_id);
+            $item['quantity'] +=1;
+            $item['amount'] =$item['price']*$item['quantity'];
+            $this->cart->push($item);
+        }
+        $this->cart->sortBy('name');
 
         //session
+        // session()->forget('cart');
         session()->put('cart',$this->cart->all());
 
         //event
         $this->emit('cartUpdated',$this->cart);
+
+        
     }
 
     public function removeFromCart(Product $product) {

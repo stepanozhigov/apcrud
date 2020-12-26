@@ -64,14 +64,19 @@
                                     <div class="my-4">
                                         <div class="card">
                                             <div class="card-header">
-                                              Order Cart ({{count($cart)}})
+                                                <div class="d-flex justify-content-between">
+                                                    <span>Order Cart ({{count($cart)}})</span>
+                                                    <span><b>{{$cart_total}} $</b></span>
+                                                </div>
                                             </div>
                                             <div class="card-body">
-                                                {{-- PRODUCTS TABLE: cart list --}}
+                                                {{-- PRODUCTS TABLE: checkout list --}}
                                                 @if($cart->count() > 0)
-                                                {{-- <livewire:products-table type="cart" :products="$cart" /> --}}
+                                                    {{-- <livewire:products-order-table type="checkout" /> --}}
                                                 @else   
-                                                <button type="button" class="btn btn-primary" wire:click.prevent="setTab('products')">Select Products</button>
+                                                    <button type="button" class="btn btn-primary" wire:click.prevent="setTab('products')">
+                                                        Select Products
+                                                    </button>
                                                 @endif
                                             </div>
                                         </div>
@@ -127,7 +132,7 @@
                                 @if($tab == 'products')
                                 <div class="tab-pane {{ $tab == 'products' ? 'fade show active' : 'fade' }}">
                                     {{-- PRODUCTS TABLE: Add to order --}}
-                                    <livewire:products-order-table />
+                                    <livewire:products-order-table type="cart" />
                                 </div>
                                 @endif
                               </div>
