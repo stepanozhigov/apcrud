@@ -17,7 +17,7 @@ class ProductsOrderTable extends Component
     public $type;
 
     protected $listeners = [
-        
+        'cartUpdated'=>'getCartProducts'
     ];
 
     public function mount() {
@@ -51,14 +51,29 @@ class ProductsOrderTable extends Component
                         'price' => $product->price,
                         'amount' => 0,
                     ];
+
+                    //check if item is in cart already and update quantity, amount
+                    //quantity from history, price and amount actual 
+                    $cart_item = $this->getCartItemByProductId($product->id);
+                    if($cart_item) {
+                        $item['quantity'] =  $cart_item['quantity'];
+                        $item['amount'] =  $item['quantity']*$product->price;
+                    }
+
+                    // dd($cart_item);
+
                     $items->push($item);
             });
             $this->cart_products =  $items;
         }
     }
 
-    public function getCartProductById($product_id) {
+    public function getProductById($product_id) {
         return $this->cart_products->firstWhere('product_id',$product_id);
+    }
+
+    public function getCartItemByProductId($product_id) {
+        return $this->cart->firstWhere('product_id',$product_id);
     }
 
     public function changeCart($action = 'add',$product_id) {
@@ -84,10 +99,11 @@ class ProductsOrderTable extends Component
             }
             $item['amount'] = $item['quantity']*$item['price'];
             $this->cart[$cart_key] = $item;
+
         } else {
             //add product to cart
             // dd('new');
-            $item = $this->getCartProductById($product_id);
+            $item = $this->getProductById($product_id);
             $item['quantity'] +=1;
             $item['amount'] =$item['price']*$item['quantity'];
             $this->cart->push($item);
@@ -95,33 +111,12 @@ class ProductsOrderTable extends Component
         $this->cart->sortBy('name');
 
         //session
-        // session()->forget('cart');
         session()->put('cart',$this->cart->all());
 
         //event
         $this->emit('cartUpdated',$this->cart);
 
         
-    }
-
-    public function removeFromCart(Product $product) {
-
-        //get item id in cart
-        $cart_key = $this->cart->search(function($item,$i) use ($product) {
-            return $product->id == $item['product_id'];
-        });
-        
-        //update
-        $item = $this->cart[$cart_key];
-        $item['quantity'] -=1;
-        $item['amount'] = $item['quantity']*$item['price'];
-        $this->cart[$cart_key] = $item;
-
-        //session
-        session()->put('cart',$this->cart->all());
-
-        //event
-        $this->emit('cartUpdated',$this->cart);
     }
 
     public function render()
