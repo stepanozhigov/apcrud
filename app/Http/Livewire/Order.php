@@ -14,22 +14,22 @@ class Order extends Component
     public $customer;
     public $cart;
     public $cart_total;
-    public $tab = 'products';
+    public $tab = 'order';
 
 
     protected $listeners = [
-        //'cartUpdatedEvent' => 'cartUpdatedCallback',
         'customerSelected' => 'customerSelectedCallback',
-        'customerCleared' => 'customerClearedCallback'
+        'customerCleared' => 'customerClearedCallback',
+        'cartUpdated' => 'getCart'
     ];
 
     public function mount() {
-        $this->setSessionCustomer();
-        $this->setSessionOrderProducts();
-        $this->setCartTotal();
+        $this->getCustomer();
+        $this->getCart();
+        $this->getCartTotal();
     }
 
-    public function setSessionOrderProducts() {
+    public function getCart() {
         $cart = session()->get('cart');
         if($cart) {
             $this->cart = collect($cart);
@@ -37,10 +37,9 @@ class Order extends Component
         } else {
             $this->cart = collect([]);
         }
-        //dd($this->cart);
     }
 
-    public function setSessionCustomer() {
+    public function getCustomer() {
         $this->selected_customer_id = session()->get('selected_customer_id');
         
         if($this->selected_customer_id) {
@@ -50,7 +49,7 @@ class Order extends Component
         }
     }
 
-    public function setCartTotal() {
+    public function getCartTotal() {
         $total = $this->cart->reduce(function ($total, $product) {
             return $total + $product['amount'];
         }, 0);
@@ -59,10 +58,6 @@ class Order extends Component
 
     public function setTab($tabName) {
         $this->tab = $tabName;
-    }
-
-    public function cartUpdatedCallback($ids) {
-        $this->cart = Product::whereIn('id',array_values($ids))->orderBy('name')->get();
     }
 
     public function customerSelectedCallback(Customer $customer) {

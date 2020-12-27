@@ -72,7 +72,7 @@
                                             <div class="card-body">
                                                 {{-- PRODUCTS TABLE: checkout list --}}
                                                 @if($cart->count() > 0)
-                                                    {{-- <livewire:products-order-table type="checkout" /> --}}
+                                                    <livewire:products-order-table type="checkout" />
                                                 @else   
                                                     <button type="button" class="btn btn-primary" wire:click.prevent="setTab('products')">
                                                         Select Products
