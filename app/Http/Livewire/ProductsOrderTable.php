@@ -15,6 +15,13 @@ class ProductsOrderTable extends Component
     public $cart;
     //type of table
     public $type;
+    //current page
+    public $current_page;
+    //pages (count)
+    public $pages;
+    //search (name)
+    public $searchTerm;
+    public $searchLabel = 'Search';
 
     protected $listeners = [
         'cartUpdated'=>'getTableProducts'
@@ -23,6 +30,11 @@ class ProductsOrderTable extends Component
     public function mount() {
         // dd(session()->get('cart'));
         $this->getCart();
+        $this->getTableProducts();
+    }
+
+    //update search
+    public function updatedSearchTerm() {
         $this->getTableProducts();
     }
 
@@ -38,11 +50,24 @@ class ProductsOrderTable extends Component
     }
 
     public function getTableProducts($cart = false) {
-        $this->products = Product::orderBy('name')->get();
-        $items = collect([]);
+        //get products grom db
+        if(!$this->searchTerm) {
+            $this->products = Product::orderBy('name')->get();
+            //unset search label
+            $this->searchLabel = "Search";
+        }
+         //get search products grom db
+        else {
+            $this->products = Product::where('name','like','%'.$this->searchTerm.'%')->orderBy('name')->get();
+            //set search label
+            $this->searchLabel = 'Search complete ( '.$this->products->count().' found)';
+        }
+
         if(!$cart) {
             $cart = $this->cart;
         }
+
+        $items = collect([]);
 
         if($this->products->count() > 0) {
             $this->products->each(function ($product, $key) use ($items,$cart) {
