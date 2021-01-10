@@ -3,7 +3,7 @@
 @endphp
 <div class="product-order-table">
     <div class="input-group mt-4">
-        <span class="input-group-text" id="basic-addon1">{{$searchLabel}}</span>
+        <span class="input-group-text">{{$searchLabel}}</span>
         <input wire:model.lazy="searchTerm" type="text" class="form-control" placeholder="Product name..." aria-label="Username">
     </div>
     <table class="table table-striped table-hover mt-4">
@@ -23,7 +23,7 @@
         <tbody>
             {{-- CART --}}
             @if($type == 'cart')
-                @foreach ($cart_products as $item)
+                @foreach ($products as $item)
                     <tr>
                         <td>{{$item['name']}}</th>
                         <td>{{$item['quantity']}}</td>
@@ -66,4 +66,10 @@
             @endif
         </tbody>
     </table>
+    <nav>
+        <ul class="pagination">
+          <li class="page-item"><a class="page-link" href="#" wire:click.prevent="goToPrevPage">Previous</a></li>
+          <li class="page-item"><a class="page-link" href="#" wire:click.prevent="goToNextPage">Next</a></li>
+        </ul>
+      </nav>
 </div>

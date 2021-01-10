@@ -7,24 +7,24 @@ use Livewire\Component;
 
 class ProductsOrderTable extends Component
 {
-    //db products
+    //products
     public $products;
-    //products for cart
-    public $cart_products;
-    //products selected for checkout
+    //cart
     public $cart;
     //type of table
     public $type;
     //current page
-    public $current_page;
+    public $currentPage = 1;
+    //models on page
+    public $onPage = 15;
     //pages (count)
-    public $pages;
+    public $pages = 0;
     //search (name)
     public $searchTerm;
     public $searchLabel = 'Search';
 
     protected $listeners = [
-        'cartUpdated'=>'getTableProducts'
+        'cartUpdated'=>'getTableProducts',
     ];
 
     public function mount() {
@@ -33,8 +33,25 @@ class ProductsOrderTable extends Component
         $this->getTableProducts();
     }
 
+    //go to previous page
+    public function goToPrevPage() {
+        // if() {
+            $this->currentPage -= 1;
+            $this->getTableProducts();
+        // }
+    }
+
+    //go to next page
+    public function goToNextPage() {
+        // if() {
+            $this->currentPage += 1;
+            $this->getTableProducts();
+        // }
+    }
+
     //update search
     public function updatedSearchTerm() {
+        //dd('updatedSearchTerm');
         $this->getTableProducts();
     }
 
@@ -50,27 +67,29 @@ class ProductsOrderTable extends Component
     }
 
     public function getTableProducts($cart = false) {
-        //get products grom db
-        if(!$this->searchTerm) {
-            $this->products = Product::orderBy('name')->get();
-            //unset search label
-            $this->searchLabel = "Search";
-        }
-         //get search products grom db
-        else {
-            $this->products = Product::where('name','like','%'.$this->searchTerm.'%')->orderBy('name')->get();
-            //set search label
-            $this->searchLabel = 'Search complete ( '.$this->products->count().' found)';
-        }
 
         if(!$cart) {
             $cart = $this->cart;
         }
 
-        $items = collect([]);
+        //start select index
+        $skip = $this->onPage * ($this->currentPage - 1);
 
-        if($this->products->count() > 0) {
-            $this->products->each(function ($product, $key) use ($items,$cart) {
+        //get products from db
+        if(!$this->searchTerm) {
+            $products = Product::orderBy('name')->take($this->onPage)->skip($skip)->get();
+            //unset search label
+            $this->searchLabel = "Search";
+        }
+         //get search products grom db
+        else {
+            $products = Product::where('name','like','%'.$this->searchTerm.'%')->orderBy('name')->get();
+            //set search label
+            $this->searchLabel = 'Search complete ('.$products->count().' found)';
+        }
+
+        // if($products->count() > 0) {
+            $cart_products = $products->map(function ($product, $key) use ($cart) {
                 $item = [
                     'product_id' => $product->id,
                     'name' => $product->name,
@@ -86,14 +105,19 @@ class ProductsOrderTable extends Component
                     $item['quantity'] =  $cart_item['quantity'];
                     $item['amount'] =  $item['quantity']*$product->price;
                 }
-                $items->push($item);
+                return $item;
             });
-            $this->cart_products =  $items;
-        }
+
+            //set transformed products to paginated data
+            $this->products = $cart_products;
+
+            // dd($this->products);
+        // }
     }
 
     public function getProductById($product_id) {
-        return $this->cart_products->firstWhere('product_id',$product_id);
+        //dd($this->products);
+        return $this->products->firstWhere('product_id',$product_id);
     }
 
     public function getCartItemByProductId($product_id) {
@@ -156,8 +180,6 @@ class ProductsOrderTable extends Component
 
         //event
         $this->emit('cartUpdated',$this->cart);
-
-        
     }
 
     public function render()
